@@ -1,0 +1,69 @@
+/* eslint-disable max-len */
+/* eslint-disable indent */
+/* eslint-disable id-blacklist */
+'use strict';
+
+const fetch = require('node-fetch');
+const MongoClient = require('mongodb').MongoClient;
+const url = 'mongodb://localhost/pa11y-webservice-dev';
+
+MongoClient.connect(url, (err, db) => {
+    if (err) {
+        throw err;
+    }
+    const dbo = db.db('pa11y-webservice-dev');
+    const query = {};
+
+    dbo.collection('tasks').find(query).toArray((_err, result) => {
+        if (err) {
+            throw err;
+        }
+        db.close();
+        console.log(result);
+        // eslint-disable-next-line no-shadow
+        const idArray = result.map(result => {
+            // eslint-disable-next-line no-underscore-dangle
+            return result._id;
+        });
+        console.log('Array of task Ids: \n');
+        console.log(idArray);
+
+        // eslint-disable-next-line no-plusplus
+        // for (let i = 0; i < idArray.length; i++) {
+        // 	console.log(`${i} : ${idArray[i]}`);
+
+        // 	const postUrl = `http://0.0.0.0:3999/tasks/${idArray[i]}/run`;
+        // 	fetch(postUrl, {
+        // 		method: 'POST'
+        // 	}).then(() => {
+        // 		// eslint-disable-next-line max-len
+        // 		console.log(`${idArray[i]} task successfully run! Request #${i} / ${idArray.length}`);
+        // 	});
+        // }
+    });
+});
+
+// eslint-disable-next-line handle-callback-err
+MongoClient.connect(url, (err, db) => {
+    const dbo2 = db.db('pa11y-webservice-dev');
+    // const query2 = {task: 'ObjectId(\'6075e90f2095a67035afae2b\')'};
+    const query2 = {date: '1618340131443'};
+
+
+    dbo2.collection('results').find(query2).toArray((err1, result) => {
+        if (err1) {
+            throw err1;
+        }
+        console.log('Results of first task: \n');
+        console.log(result);
+
+        const resultArray = result.map(result2 => {
+            // eslint-disable-next-line no-underscore-dangle
+            return result2;
+        });
+
+        console.log(resultArray);
+
+        db.close();
+    });
+});
