@@ -6011,6 +6011,11 @@ ul.date-links {
     width: 100%
 }
 
+.graphCard {
+    height: 150px;
+    width: 100%
+}
+
 .graph-spacer {
     margin-bottom: 40px;
     padding-bottom: 30px
