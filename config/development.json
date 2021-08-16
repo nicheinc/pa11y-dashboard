@@ -1,7 +1,7 @@
 {
 	"port": 4001,
 	"noindex": true,
-	"readonly": true,
+	"readonly": false,
 	"webservice": {
 		"database": "mongodb://localhost/pa11y-webservice-dev",
 		"host": "0.0.0.0",
