@@ -91,6 +91,29 @@ The boot configurations for Pa11y Dashboard are as follows. Look at the sample J
 
 ### webservice
 This can either be an object containing [Pa11y Webservice configurations][pa11y-webservice-config], or a string which is the base URL of a [Pa11y Webservice][pa11y-webservice] instance you are running separately. If using environment variables, prefix the webservice vars with `WEBSERVICE_`.
+## Docker
+
+This application can be ran in docker via docker-compose.  A config file for docker (`docker.sample.json`) has been added to the `config` folder. The Dockerfile has been
+configured to use that sample file by default, but you can change any values by copying that file to `docker.json`. By default the dashboard will be available at
+`http://localhost:4001` with the default configuration.
+
+The `docker-compose.yaml` file has been preconfigured to start a mongodb database along with the pa11y dashboard.
+
+To start the application:
+```sh
+docker-compose up
+```
+
+Starting the application headless.
+```sh
+docker-compose up -d
+```
+
+Stopping the dashboard
+```sh
+docker-compose stop
+```
+
 
 ## Contributing
 
