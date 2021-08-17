@@ -18,6 +18,8 @@ RUN chown node:node /app
 
 COPY --chown=node:node . /app
 
+RUN if [ ! -f /app/config/{$NODE_ENV}.json ]; then cp /app/config/${NODE_ENV}.sample.json /app/config/${NODE_ENV}.json; fi
+
 RUN usermod -a -G audio,video node
 
 USER node
