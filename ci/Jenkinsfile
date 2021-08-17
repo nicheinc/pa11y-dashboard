@@ -1,0 +1,68 @@
+pipeline {
+  agent {
+    kubernetes {
+      defaultContainer 'jnlp'
+      yamlFile 'ci/BuildPod.yaml'
+    }
+  }
+  environment {
+    SHORT_COMMIT = sh(
+      script: "printf \$(git rev-parse --short ${GIT_COMMIT})",
+      returnStdout: true
+    )
+  }
+  stages {
+    stage('Build Test Image') {
+      environment {
+        PATH = "/busybox:/kaniko:$PATH"
+      }
+      steps {
+        container(name: 'kaniko', shell: '/busybox/sh') {
+          sh """#!/busybox/sh
+            /kaniko/executor \
+              --dockerfile=Dockerfile \
+              --build-arg REGISTRY=${REGISTRY} \
+              --context=\$(pwd) \
+              --cache=true \
+              --cleanup=true \
+              --verbosity=warn \
+              --destination=${STAGE_REGISTRY}/pa11y-dashboard:${SHORT_COMMIT}.b${BUILD_ID}
+            if [[ \$? != 0 ]]; then
+              exit 1
+            fi
+            echo "✔ Test image successfully built!"
+          """
+        }
+      }
+    }
+    stage('Build And Ship Image') {
+      when {
+        buildingTag()
+      }
+      steps {
+        container(name: 'kaniko', shell: '/busybox/sh') {
+          sh """#!/busybox/sh
+            /kaniko/executor \
+              --dockerfile=Dockerfile \
+              --build-arg REGISTRY=${REGISTRY} \
+              --context=\$(pwd) \
+              --cache=true \
+              --cache-repo=${STAGE_REGISTRY}/pa11y-dashboard/cache \
+              --verbosity=warn \
+              --destination ${PRODUCTION_REGISTRY}/pa11y-dashboard:${TAG_NAME}
+            if [[ \$? != 0 ]]; then
+              exit 1
+            fi
+            echo "✔ Production image successfully built!"
+          """
+        }
+        container('jnlp') {
+          slackSend(
+            color: 'good',
+            message: "`pa11y-dashboard:${TAG_NAME}` shipped and ready for deployment!"
+          )
+        }
+      }
+    }
+  }
+}
