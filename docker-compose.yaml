@@ -1,0 +1,25 @@
+version: "3.8"
+services: 
+  pa11y:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: ${USER:?USER}/pa11y:latest
+    container_name: pa11y
+    ports:
+      - 4001:4001
+    restart: unless-stopped
+    cap_add: 
+      - SYS_ADMIN
+    depends_on:
+      - mongodb
+  mongodb:
+    image: mongo:3.4
+    ports:
+      - 27017:27017
+    volumes:
+      - type: volume
+        source: mongo-data
+        target: /data/db
+volumes: 
+  mongo-data:
